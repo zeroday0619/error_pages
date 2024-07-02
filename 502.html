@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, minimum-scale=1, width=device-width">
+        <title>502 Bad Gateway | Reverse Proxy</title>
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial, sans-serif;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                box-sizing: border-box;
+            }
+            article {
+                flex: 1;
+                padding: 20px;
+            }
+            footer {
+                position: relative;
+                bottom: 0;
+                width: 100%;
+                background-color: #f1f1f1;
+                text-align: center;
+                padding: 10px 0;
+                box-sizing: border-box;
+            }
+        </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', (event) => {
+                fetch('https://api.ipify.org?format=json')
+                    .then(response => response.json())
+                    .then(data => {
+                        const currentDate = new Date().toISOString();
+
+                        generateHashId(data.ip + currentDate).then(hashId => {
+                            document.getElementById('ip-address').textContent = "Proxy endpoint region: Japan/Tokyo | Your IP: " + data.ip;
+                            document.getElementById('pageId').textContent = "Proxy ID: " + hashId + " | " + currentDate
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error fetching the IP address:', error);
+                        document.getElementById('ip-address').textContent = "Proxy endpoint region: Japan/Tokyo | Your IP: Unable to fetch your IP address.";
+                        document.getElementById('pageId').textContent = "Proxy ID: Unable to generate Proxy ID. | " + currentDate
+                    });
+            });
+
+            async function generateHashId(input) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(input);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                return hashHex;
+            }
+        </script>
+    </head>
+    <body>
+        <article>
+            <header>
+                <h1>502 Bad Gateway</h1>
+            </header>
+            <div id="main">
+                <p>
+                    The server encountered a temporary error and could not complete your request. Please try again later.
+                    
+                    If the problem persists, contact the website administrator.
+                </p>
+                <p>
+                    サーバーで一時的なエラーが発生し、リクエストを完了することができませんでした。後でもう一度お試しください。
+    
+                    問題が解決しない場合は、ウェブサイトの管理者に連絡してください。
+                </p>
+                <p>
+                    서버에 일시적인 오류가 발생하여 요청을 완료할 수 없습니다. 나중에 다시 시도해 주세요.
+    
+                    문제가 지속되면 웹사이트 관리자에게 문의해 주세요.
+                </p>
+            </div>
+        </article>
+        <footer>
+            <p id="ip-address">Fetching your IP...</p>
+            <p id="pageId">Fetching Ray ID</p>
+        </footer>
+    </body>
+</html>
